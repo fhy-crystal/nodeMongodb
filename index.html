@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Node Express Mongodb</title>
+</head>
+<body>
+	<section>
+		name: <input type="text" id="name">
+		<br>
+		age: <input type="text" id="age">
+		<br>
+		<button id="jqPost">发送</button>
+	</section>
+
+	<section>
+		<table>
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>name</th>
+					<th>age</th>
+				</tr>
+			</thead>
+			<tbody id="displayTable"></tbody>
+		</table>
+	</section>
+
+	<script src="http://apps.bdimg.com/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			refreshData();
+			$('#jqPost').click(function() {
+				if ($('#name').val() == '') {
+					alert('请输入name');
+					return false;
+				}
+				var postBody = {
+					'name': $('#name').val(),
+					'age': parseInt($('#age').val())
+				};
+				$.ajax({
+					url: 'http://localhost:8081/postTest',
+					type: 'POST',
+					dataType: 'JSON',
+					contentType: "application/json; charset=utf-8",
+					data: JSON.stringify(postBody)
+				})
+				.done(function(data) {
+					console.log(data);
+					console.log("success");
+					refreshData();
+				})
+				.fail(function(data) {
+					console.log('请重试');
+				});
+			});
+
+			function refreshData() {
+				$.ajax({
+					url: 'http://localhost:8081/query',
+					type: 'GET',
+					dataType: 'JSON',
+					contentType: "application/json; charset=utf-8",
+					data: '',
+				})
+				.done(function(data) {
+					var disTable = $('#displayTable');
+					if (data && data.length > 0) {
+						disTable.empty();
+						var $tr = '';
+						for (var i = 0; i < data.length; i++) {
+							$tr = $('<tr><td style="width:250px;text-align:center">' + data[i]._id + '</td><td style="width:250px;text-align:center">' + data[i].name + '</td><td style="width:250px;text-align:center">' + data[i].age + '</td></tr>');
+							disTable.append($tr);
+						}
+					}
+				})
+				.fail(function(data) {
+					console.log('请重试');
+				});
+			}
+		});
+	</script>
+</body>
+</html>
