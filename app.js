@@ -32,10 +32,10 @@ var insertData = function(data, db, callback) {
 }
 
 // 查询数据
-var queryData = function(db, callback) {
+var queryData = function(data, db, callback) {
 	//连接到表  
 	var collection = db.collection('nodeMongoTable');
-	collection.find().toArray(function(err, result) {
+	collection.find(data).toArray(function(err, result) {
 		if(err) {
 		  console.log('Error:'+ err);
 		  return;
@@ -44,14 +44,42 @@ var queryData = function(db, callback) {
   });
 }
 
+// 删除数据
+var deleteData = function(data, db, callback) {
+	// 连接到表
+	var collection = db.collection('nodeMongoTable');
+	collection.remove(data, function(err, result) {
+		if (err) {
+			console.log('Error:' + err);
+			return;
+		}
+		callback(result);
+	})
+}
+
+var editData = function(data, changeData, db, callback) {
+	// 连接到表
+	var collection = db.collection('nodeMongoTable');
+	collection.update(data, {'$set': changeData}, function(err, result) {
+		if (err) {
+			console.log('Error:' + err);
+			return;
+		}
+		callback(result);
+	})
+}
+
+
 // 插入数据
 app.post('/postTest', function(req, res){
 	// req.body 获取json格式传递的参数
 	console.log(req.body);
 	// 调用mongo插入数据方法
 	MongoClient.connect(URL, function(err, db) {
-		console.log("连接成功！");
-		insertData(req.body, db, function(result) {
+		console.log("插入连接成功！");
+		var insertBody = req.body;
+		insertBody['_id'] = Date.now().toString();
+		insertData(insertBody, db, function(result) {
 			res.end(JSON.stringify(result));
 			db.close();
 		});
@@ -62,10 +90,53 @@ app.post('/postTest', function(req, res){
 app.get('/query', function(req, res) {
 	// 调用mongo查询数据方法
 	MongoClient.connect(URL, function(err, db) {
-		console.log('连接成功');
-		queryData(db, function(result) {
+		console.log('查询连接成功');
+		queryData({}, db, function(result) {
 			res.end(JSON.stringify(result));
 			db.close();
+		})
+	})
+})
+
+// 查询单个
+app.post('/queryone', function(req, res) {
+	// 调用mongo查询数据方法
+	MongoClient.connect(URL, function(err, db) {
+		console.log('查询单个连接成功');
+		queryData(req.body, db, function(result) {
+			res.end(JSON.stringify(result));
+			db.close();
+		})
+	})
+})
+
+// 删除
+app.post('/deleteTest', function(req, res) {
+	// req.body 获取json格式传递的参数
+	console.log(req.body);
+	// 调用mongo删除数据方法
+	MongoClient.connect(URL, function(err, db) {
+		console.log('删除连接成功');
+		deleteData(req.body, db, function(result) {
+			res.end(JSON.stringify(result));
+			db.close();
+		})
+	})
+})
+
+// 更改
+app.post('/updateTest', function(req, res) {
+	// req.body 获取json格式传递的参数
+	console.log(req.body);
+	// 调用mongo更新数据方法
+	MongoClient.connect(URL, function(err, db) {
+		console.log('更新连接成功');
+		var findData = {
+			'_id': req.body['_id']
+		};
+		editData(findData, req.body, db, function(result) {
+			res.end(JSON.stringify(result));
+			db.close;
 		})
 	})
 })

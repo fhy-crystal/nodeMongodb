@@ -20,6 +20,8 @@
 					<th>id</th>
 					<th>name</th>
 					<th>age</th>
+					<th>delete</th>
+					<th>edit</th>
 				</tr>
 			</thead>
 			<tbody id="displayTable"></tbody>
@@ -70,9 +72,35 @@
 						disTable.empty();
 						var $tr = '';
 						for (var i = 0; i < data.length; i++) {
-							$tr = $('<tr><td style="width:250px;text-align:center">' + data[i]._id + '</td><td style="width:250px;text-align:center">' + data[i].name + '</td><td style="width:250px;text-align:center">' + data[i].age + '</td></tr>');
+							$tr = $('<tr><td style="width:250px;text-align:center">' + data[i]._id + '</td><td style="width:250px;text-align:center">' + data[i].name + '</td><td style="width:250px;text-align:center">' + data[i].age + '</td><td style="width:250px;text-align:center"><a style="cursor:pointer;color:blue" data-id="' + data[i]._id + '" class="delete">delete</a></td><td style="width:250px;text-align:center"><a style="cursor:pointer;color:blue" data-id="' + data[i]._id + '" class="edit">edit</a></td></tr>');
 							disTable.append($tr);
 						}
+
+						// 删除
+						$('.delete').click(function() {
+							var postBody = {
+								'_id': $(this).attr('data-id')
+							};
+							console.log(postBody);
+							$.ajax({
+								url: 'http://localhost:8081/deleteTest',
+								type: 'POST',
+								dataType: 'JSON',
+								contentType: "application/json; charset=utf-8",
+								data: JSON.stringify(postBody),
+							})
+							.done(function(data) {
+								refreshData();
+							})
+							.fail(function(data) {
+								console.log('请重试');
+							});
+						});
+
+						// 编辑
+						$('.edit').click(function() {
+							window.location.href = 'edit.html?id=' + $(this).attr('data-id');
+						});
 					}
 				})
 				.fail(function(data) {

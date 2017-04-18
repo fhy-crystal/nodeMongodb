@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>edit</title>
+</head>
+<body>
+	id：<span id="editId"></span>
+	<br>
+	name: <input type="text" id="name">
+	<br>
+	age: <input type="text" id="age">
+	<br>
+	<button id="save">保存</button>
+
+	<script src="http://apps.bdimg.com/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			var queryInfo = window.location.search; // 获取url?后面信息
+			var postBody = {
+				'_id': queryInfo.split('=')[1]
+			};
+			queryOne(postBody);
+			// 查询单个信息
+			function queryOne(info) {
+				$.ajax({
+					url: 'http://localhost:8081/queryone',
+					type: 'POST',
+					dataType: 'JSON',
+					contentType: "application/json; charset=utf-8",
+					data: JSON.stringify(info),
+				})
+				.done(function(data) {
+					if (data) {
+						$('#editId').html(data[0]['_id']);
+						$('#name').val(data[0].name);
+						$('#age').val(data[0].age);
+					}
+				})
+				.fail(function() {
+					console.log("查询单个失败");
+				});
+				
+			}
+
+			// 保存
+			$('#save').click(function() {
+				var postBody = {
+					'_id': $('#editId').html(),
+					'name': $('#name').val(),
+					'age': $('#age').val()
+				};
+				$.ajax({
+					url: 'http://localhost:8081/updateTest',
+					type: 'POST',
+					dataType: 'JSON',
+					contentType: "application/json; charset=utf-8",
+					data: JSON.stringify(postBody),
+				})
+				.done(function(data) {
+					window.location.href = 'index.html';
+				})
+				.fail(function() {
+					console.log("保存失败");
+				});
+			});
+		});
+	</script>
+</body>
+</html>
