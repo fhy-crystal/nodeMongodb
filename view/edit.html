@@ -24,17 +24,21 @@
 			// 查询单个信息
 			function queryOne(info) {
 				$.ajax({
-					url: 'http://localhost:8081/queryone',
+					url: 'http://localhost:8081/edit/queryone',
 					type: 'POST',
 					dataType: 'JSON',
 					contentType: "application/json; charset=utf-8",
 					data: JSON.stringify(info),
 				})
 				.done(function(data) {
-					if (data) {
-						$('#editId').html(data[0]['_id']);
-						$('#name').val(data[0].name);
-						$('#age').val(data[0].age);
+					if (data.status == 0) {
+						if (data.data && data.data.length > 0) {
+							$('#editId').html(data.data[0]['_id']);
+							$('#name').val(data.data[0].name);
+							$('#age').val(data.data[0].age);
+						}
+					} else {
+						console.log(data.msg);
 					}
 				})
 				.fail(function() {
@@ -51,14 +55,18 @@
 					'age': $('#age').val()
 				};
 				$.ajax({
-					url: 'http://localhost:8081/updateTest',
+					url: 'http://localhost:8081/edit/update',
 					type: 'POST',
 					dataType: 'JSON',
 					contentType: "application/json; charset=utf-8",
 					data: JSON.stringify(postBody),
 				})
 				.done(function(data) {
-					window.location.href = 'index.html';
+					if (data.status == 0) {
+						window.location.href = 'index.html';
+					} else {
+						console.log(data.msg);
+					}
 				})
 				.fail(function() {
 					console.log("保存失败");

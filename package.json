@@ -1,0 +1,23 @@
+{
+  "name": "nodeMongodb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "mongodb": "^2.2.25"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fhy-crystal/nodeMongodb.git"
+  },
+  "keywords": ["node", "express", "mongodb"],
+  "author": "fhy-crystal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fhy-crystal/nodeMongodb/issues"
+  },
+  "homepage": "https://github.com/fhy-crystal/nodeMongodb#readme"
+}

@@ -1,0 +1,1 @@
+module.exports = 'mongodb://172.16.10.215:27017/nodeMongoDB';

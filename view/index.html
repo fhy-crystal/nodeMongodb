@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Node Express Mongodb</title>
+</head>
+<body>
+	<section>
+		name: <input type="text" id="name">
+		<br>
+		age: <input type="text" id="age">
+		<br>
+		<button id="jqPost">发送</button>
+	</section>
+
+	<section>
+		<table>
+			<thead>
+				<tr>
+					<th style="width:250px;text-align:center">id</th>
+					<th style="width:250px;text-align:center">name</th>
+					<th style="width:250px;text-align:center">age</th>
+					<th style="width:250px;text-align:center">delete</th>
+					<th style="width:250px;text-align:center">edit</th>
+				</tr>
+			</thead>
+			<tbody id="displayTable"></tbody>
+		</table>
+	</section>
+
+	<script src="http://apps.bdimg.com/libs/jquery/1.6.4/jquery.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			refreshData();
+			$('#jqPost').click(function() {
+				if ($('#name').val() == '') {
+					alert('请输入name');
+					return false;
+				}
+				var postBody = {
+					'name': $('#name').val(),
+					'age': parseInt($('#age').val())
+				};
+				$.ajax({
+					url: 'http://localhost:8081/add',
+					type: 'POST',
+					dataType: 'JSON',
+					contentType: "application/json; charset=utf-8",
+					data: JSON.stringify(postBody)
+				})
+				.done(function(data) {
+					if (data.status == 0) {
+						refreshData();
+					} else {
+						console.log(data.msg);
+					}
+				})
+				.fail(function(data) {
+					console.log('请重试');
+				});
+			});
+
+			function refreshData() {
+				$.ajax({
+					url: 'http://localhost:8081/query',
+					type: 'GET',
+					dataType: 'JSON',
+					contentType: "application/json; charset=utf-8",
+					data: '',
+				})
+				.done(function(data) {
+					var disTable = $('#displayTable');
+					if (data.status == 0) {
+						if (data.data && data.data.length > 0) {
+							disTable.empty();
+							var $tr = '';
+							for (var i = 0; i < data.data.length; i++) {
+								$tr = $('<tr><td style="text-align:center">' + data.data[i]._id + '</td><td style="text-align:center">' + data.data[i].name + '</td><td style="text-align:center">' + data.data[i].age + '</td><td style="text-align:center"><a style="cursor:pointer;color:blue" data-id="' + data.data[i]._id + '" class="delete">delete</a></td><td style="text-align:center"><a style="cursor:pointer;color:blue" data-id="' + data.data[i]._id + '" class="edit">edit</a></td></tr>');
+								disTable.append($tr);
+							}
+
+							// 删除
+							$('.delete').click(function() {
+								var postBody = {
+									'_id': $(this).attr('data-id')
+								};
+								console.log(postBody);
+								$.ajax({
+									url: 'http://localhost:8081/delete',
+									type: 'POST',
+									dataType: 'JSON',
+									contentType: "application/json; charset=utf-8",
+									data: JSON.stringify(postBody),
+								})
+								.done(function(data) {
+									if (data.status == 0) {
+										refreshData();
+									} else {
+										console.log(data.msg);
+									}
+								})
+								.fail(function(data) {
+									console.log('请重试');
+								});
+							});
+
+							// 编辑
+							$('.edit').click(function() {
+								window.location.href = 'edit.html?id=' + $(this).attr('data-id');
+							});
+						} else {
+							disTable.empty();
+						}
+					} else {
+						console.log(data.msg);
+					}
+				})
+				.fail(function(data) {
+					console.log('请重试');
+				});
+			}
+		});
+	</script>
+</body>
+</html>
